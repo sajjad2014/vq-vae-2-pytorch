@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import datasets
 import lmdb
-
+import numpy as np
 
 CodeRow = namedtuple('CodeRow', ['top', 'bottom', 'filename'])
 
@@ -49,3 +49,19 @@ class LMDBDataset(Dataset):
             row = pickle.loads(txn.get(key))
 
         return torch.from_numpy(row.top), torch.from_numpy(row.bottom), row.filename
+
+
+class CIFARDataset(Dataset):
+    def __init__(self, normal_class, transform, train=True):
+        self.dataset = datasets.CIFAR10(root="./data",
+                                        train=train,
+                                        download=True,
+                                        transform=transform)
+        self.indices = np.arange(len(self.dataset.targets))[np.array(self.dataset.targets) == normal_class]
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, index):
+        return self.dataset[self.indices[index]]

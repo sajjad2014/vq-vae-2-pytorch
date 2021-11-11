@@ -6,10 +6,11 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 
-from torchvision import datasets, transforms, utils
+from torchvision import transforms, utils
 
 from tqdm import tqdm
 
+from dataset import CIFARDataset
 from vqvae import VQVAE
 from scheduler import CycleScheduler
 import distributed as dist
@@ -95,7 +96,8 @@ def main(args):
         ]
     )
 
-    dataset = datasets.ImageFolder(args.path, transform=transform)
+    # dataset = datasets.ImageFolder(args.path, transform=transform)
+    dataset = CIFARDataset(args.normal_class, transform)
     sampler = dist.data_sampler(dataset, shuffle=True, distributed=args.distributed)
     loader = DataLoader(
         dataset, batch_size=128 // args.n_gpu, sampler=sampler, num_workers=2
@@ -143,7 +145,8 @@ if __name__ == "__main__":
     parser.add_argument("--epoch", type=int, default=560)
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--sched", type=str)
-    parser.add_argument("path", type=str)
+    parser.add_argument("--path", type=str)
+    parser.add_argument("--normal_class", type=str, default=0)
 
     args = parser.parse_args()
 
