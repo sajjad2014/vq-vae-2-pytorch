@@ -33,7 +33,7 @@ def train(epoch, loader, model, optimizer, scheduler, device):
 
         img = img.to(device)
 
-        out, latent_loss = model(img)
+        out, latent_loss, _, _ = model(img)
         recon_loss = criterion(out, img)
         latent_loss = latent_loss.mean()
         loss = recon_loss + latent_loss_weight * latent_loss
@@ -69,7 +69,7 @@ def train(epoch, loader, model, optimizer, scheduler, device):
                 sample = img[:sample_size]
 
                 with torch.no_grad():
-                    out, _ = model(sample)
+                    out, _, _, _ = model(sample)
 
                 utils.save_image(
                     torch.cat([sample, out], 0),
