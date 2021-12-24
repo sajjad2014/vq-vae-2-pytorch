@@ -52,12 +52,15 @@ class LMDBDataset(Dataset):
 
 
 class CIFARDataset(Dataset):
-    def __init__(self, normal_class, transform, train=True):
+    def __init__(self, normal_class, transform, train=True, is_normal=True):
         self.dataset = datasets.CIFAR10(root="./data",
                                         train=train,
                                         download=True,
                                         transform=transform)
-        self.indices = np.arange(len(self.dataset.targets))[np.array(self.dataset.targets) == normal_class]
+        if is_normal:
+            self.indices = np.arange(len(self.dataset.targets))[np.array(self.dataset.targets) == normal_class]
+        else:
+            self.indices = np.arange(len(self.dataset.targets))[np.array(self.dataset.targets) != normal_class]
         self.transform = transform
 
     def __len__(self):
